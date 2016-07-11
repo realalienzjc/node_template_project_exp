@@ -8,42 +8,32 @@
   },
   "main": "main.js",
   "scripts": {
-    "build": "browserify main.js  --debug | exorcist bundle.map.js  | uglifyjs  > bundle.js",  
+    "build": "browserify main.js  --debug | exorcist bundle.map.js  | uglifyjs  > bundle.js",
     "clean": "rm -rf build/ && mkdir build/",
     "test": "echo \"Error: no test specified\" && exit 1",
     "serve": "beefy main.js:bundle.js --browserify $(which browserify) --live",
     "setup": "npm install && npm run clean"
   },
   "author": "Anonymous",
-  "license": "MIT license",
+  "license": "CC-BY-SA-4.0",
   "devDependencies": {
-    "babel-preset-es2015": "^6.6.0",
-    "babelify": "^7.2.0",
     "beefy": "^2.1.6",
     "caching-coffeeify": "^0.5.1",
-    "coffeeify": "^2.0.1",
+    "del": "2.2.1",
     "exorcist": "^0.4.0",
+    "graceful-fs": "4.1.4",
     "gulp": "^3.9.1",
+    "gulp-autoprefixer": "3.1.0",
     "gulp-livereload": "^3.8.1",
     "gulp-rename": "^1.2.2",
+    "gulp-sass": "^2.3.2",
     "gulp-sourcemaps": "^1.6.0",
     "gulp-uglify": "^1.5.3",
     "gulp-util": "^3.0.7",
-    "gulp-sass": "^2.0.0",
-    "gulp-autoprefixer": "3.1.0",
     "minifyify": "^7.3.2",
-    "vinyl-buffer": "^1.0.0",
-    "vinyl-source-stream": "^1.1.0",
-    "watchify": "^3.7.0",
-    "uglifyjs": "",
-
-
-
     "require-dir": "0.3.0",
-    "graceful-fs": "4.1.4",
-    "del": "2.2.1"
-
+    "uglifyjs": "",
+    "watchify": "^3.7.0"
   },
-  "dependencies": {
-  }
+  "dependencies": {}
 }

@@ -3,10 +3,9 @@
 //   http://mikevalstar.com/post/fast-gulp-browserify-babelify-watchify-react-build/
 "use strict";
 
-var babelify   = require('babelify'),
-        browserify = require('browserify'),
-        buffer     = require('vinyl-buffer'),
-        coffeeify  = require('coffeeify'),
+var  browserify = require('browserify'),   //babelify   = require('babelify'),
+        //buffer     = require('vinyl-buffer'),
+        //coffeeify  = require('coffeeify'),
         del        = require('del'),
         fs         = require('graceful-fs'),
 
@@ -16,8 +15,8 @@ var babelify   = require('babelify'),
         livereload = require('gulp-livereload'),
         rename     = require('gulp-rename'),
         sass       = require('gulp-sass'),
-        sassdoc    = require('sassdoc');
-        source     = require('vinyl-source-stream'),
+        //sassdoc    = require('sassdoc');
+        //source     = require('vinyl-source-stream'),
         sourceMaps = require('gulp-sourcemaps'),
         path       = require('path'),
         watchify   = require('watchify');
@@ -112,13 +111,13 @@ gulp.task("sass", function() {
 
   return gulp
     .src(inputFiles)
-    .pipe(sourcemaps.init())
+    .pipe(sourceMaps.init())
     .pipe(sass(sassOptions).on('error', sass.logError))
-    .pipe(sourcemaps.write(config.tasks.css.mapDir))
+    //.pipe(sourceMaps.write(config.tasks.css.mapDir))
     .pipe(autoprefixer(autoprefixerOptions))
     .pipe(gulp.dest(dest))
-    .pipe(sassdoc())
-    .resume();  // http://sassdoc.com/gulp/#drain-event
+    // .pipe(sassdoc())
+    // .resume();  // http://sassdoc.com/gulp/#drain-event
 });
 /*
 gulp.task("sass", function() {
@@ -132,8 +131,15 @@ gulp.task("sass", function() {
     .pipe(gulp.dest(paths.dest))
     .pipe(browserSync.stream())                       // TODO: what 
 }
-});  */
 
+
+
+});  */
+gulp.task('sass:watch', function () {
+  var inputFiles = path.join(config.root.src, config.tasks.css.src, '/**/*.{' + config.tasks.css.extensions + '}');
+
+  gulp.watch(inputFiles, ['sass']);
+});
 
 
 
