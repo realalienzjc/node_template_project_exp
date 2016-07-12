@@ -18,13 +18,13 @@
   "license": "CC-BY-SA-4.0",
   "devDependencies": {
     "beefy": "^2.1.6",
-    "browser-sync": "latest",
     "caching-coffeeify": "^0.5.1",
     "del": "2.2.1",
     "exorcist": "^0.4.0",
     "graceful-fs": "4.1.4",
     "gulp": "^3.9.1",
     "gulp-autoprefixer": "3.1.0",
+    "gulp-if": "^2.0.1",
     "gulp-livereload": "^3.8.1",
     "gulp-rename": "^1.2.2",
     "gulp-sass": "^2.3.2",
@@ -34,7 +34,6 @@
     "minifyify": "^7.3.2",
     "require-dir": "0.3.0",
     "uglifyjs": "",
-    "vinyl-source-stream": "^1.0.0",
     "watchify": "^3.7.0"
   },
   "dependencies": {}

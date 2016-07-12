@@ -11,8 +11,10 @@ var  browserify = require('browserify'),   //babelify   = require('babelify'),
         fs         = require('graceful-fs'),
         gulp       = require('gulp'),
         autoprefixer = require('gulp-autoprefixer'),
+        gulpif     = require('gulp-if'),
         gutil      = require('gulp-util'),
         livereload = require('gulp-livereload'),
+        minifycss = require('gulp-minify-css'),
         rename     = require('gulp-rename'),
         sass       = require('gulp-sass'),
         //sassdoc    = require('sassdoc');
@@ -61,10 +63,10 @@ var config = {
     }   
 };
 
-// production/development environment inspection
-var env = !gutil.env.production? "Development" : "Production";
+// production/development environment inspection,  "gulp --production" for prod. env.
+var env = gutil.env.production? "Production" : "Development" ;
 console.log("Building for :  ----  " + env + "  ----");
-
+var production = gutil.env.production
 
 // for later even more complex task, or just moving tasks into separate files
 // tasks = reqDir('tasks/');  TODO: not working, due to 'require config file' needs seperate json config file which 
@@ -146,8 +148,6 @@ gulp.task("build", [
 
 
 
-
-
 gulp.task('bundle', function () {
     var bundler = browserify(config.tasks.js.src)  // Pass browserify the entry point
                                 .transform(coffeeify)      //  Chain transformations: First, coffeeify . . .
@@ -160,8 +160,6 @@ gulp.task('bundle', function () {
 
 
 // style 
-gulp.task("styles", ["sass", "moveCss"]);
-
 
 // Ref, https://www.sitepoint.com/simple-gulpy-workflow-sass/
 // Ref, https://github.com/vigetlabs/gulp-starter  , sass part
@@ -180,44 +178,39 @@ gulp.task("sass", function() {
 
   return gulp
     .src(inputFiles)
-    .pipe(sourceMaps.init())
+    .pipe(gulpif(!production, sourceMaps.init()))
     .pipe(sass(sassOptions).on('error', sass.logError))
     .pipe(autoprefixer(autoprefixerOptions))
-    .pipe(sourceMaps.write(config.tasks.css.mapDir)) // NOTE: this line should appear just before 'gulp.dest'
+    .pipe(gulpif(!production, sourceMaps.write(config.tasks.css.mapDir))) // NOTE: this line should appear just before 'gulp.dest'
+    .pipe(rename({suffix: '.min'}))
+    .pipe(minifycss())
     .pipe(gulp.dest(dest))
     // .pipe(sassdoc())
+     // .on('error', handleErrors)                              // TODO: error handling
     // .resume();  // http://sassdoc.com/gulp/#drain-event
+    // .pipe(browserSync.stream())                       // TODO: what 
 });
 /*
 gulp.task("sass", function() {
    gulp.src(paths.src)
     .pipe(gulpif(!global.production, sourcemaps.init()))   // TODO: env test
     .pipe(sass(config.tasks.css.sass))
-    .on('error', handleErrors)                              // TODO: error handling
+   
     .pipe(autoprefixer(config.tasks.css.autoprefixer))
     .pipe(gulpif(global.production, cssnano({autoprefixer: false})))
     .pipe(gulpif(!global.production, sourcemaps.write()))
     .pipe(gulp.dest(paths.dest))
-    .pipe(browserSync.stream())                       // TODO: what 
+    
 }
 
 });  */
 
 
-// TODO: can it be minify?
-gulp.task("moveCss", function() {
-  // the base option sets the relative root for the set of files,
-  // preserving the folder structure
-  return gulp.src([ "./app/stylesheets/**/*.css" ], {base: "./app/stylesheets/"} )
-  .pipe(gulp.dest("./build/stylesheets"));
+gulp.task("tell_env", function() {
+   console.log(global.production);
 });
+
   
-  
-
-
-
-
-
 gulp.task('sass:watch', function () {
   var inputFiles = path.join(config.root.src, config.tasks.css.src, '/**/*.{' + config.tasks.css.extensions + '}');
 
@@ -226,6 +219,13 @@ gulp.task('sass:watch', function () {
 
 
 
+// Development
+// gulp.task('express', function() {
+//   var express = require('express');
+//   var app = express();  //  TypeError: express is not a function
+//   app.use(express.static(__dirname));
+//   app.listen(4000, '0.0.0.0');
+// });
 
 
 
