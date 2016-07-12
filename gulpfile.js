@@ -5,7 +5,7 @@
 
 var  browserify = require('browserify'),   //babelify   = require('babelify'),
         browserSync = require("browser-sync"),
-        //buffer     = require('vinyl-buffer'),
+        buffer     = require('vinyl-buffer'),
         //coffeeify  = require('coffeeify'),
         del        = require('del'),
         fs         = require('graceful-fs'),
@@ -14,9 +14,12 @@ var  browserify = require('browserify'),   //babelify   = require('babelify'),
         gulpif     = require('gulp-if'),
         gutil      = require('gulp-util'),
         livereload = require('gulp-livereload'),
-        minifycss = require('gulp-minify-css'),
+        minifycss  = require('gulp-minify-css'),
+        notify     = require('gulp-notify'),
         rename     = require('gulp-rename'),
         sass       = require('gulp-sass'),
+        streamify  = require('gulp-streamify'),
+        uglify     = require('gulp-uglify'),
         //sassdoc    = require('sassdoc');
         source     = require('vinyl-source-stream'),
         sourceMaps = require('gulp-sourcemaps'),
@@ -67,7 +70,7 @@ var config = {
 var env = gutil.env.production? "Production" : "Development" ;
 console.log("Building for :  ----  " + env + "  ----");
 var production = gutil.env.production
-
+var development = !production
 // for later even more complex task, or just moving tasks into separate files
 // tasks = reqDir('tasks/');  TODO: not working, due to 'require config file' needs seperate json config file which 
 
@@ -93,7 +96,11 @@ function bundle (bundler) {
 
 
 // default task
-gulp.task("default", [ "clean", "build" ]); //  ,"jest"
+gulp.task('default', ['html', 'express', 'watch', 'browserify'], function() {
+
+});
+
+// gulp.task("default", [ "clean", "build" ]); //  ,"jest"
 
 
 // clean 
@@ -121,14 +128,64 @@ gulp.task("build", [
 });
 
 
+// watch
+gulp.task("watch", function() {
+  gulp.watch('./app/stylesheets/**/*.scss', ['sass']);
+  gulp.watch('./app/javascripts/**/*.js', [''])
+  gulp.watch('./app/*.js', ['']) 
+});
 
+
+
+gulp.task('browserify',  function(options) {
+    var appBundler = browserify({
+        entries: ['./app/main.js'], // Only need initial file, browserify finds the deps
+        transform: [], // reactify : We want to convert JSX to normal javascript
+        debug: !production,
+        paths: ['./app/js/'],
+        cache: {}, packageCache: {}, fullPaths: true // Requirement of watchify
+    });
+
+    // Ref. https://www.codementor.io/reactjs/tutorial/react-js-browserify-workflow-part-2
+    /* This is the actual rebundle process of our application bundle. It produces
+    a "main.js" file in our "build" folder. */
+    var rebundle = function () {
+      var start = Date.now();
+      console.log('Building APP bundle');
+      appBundler.bundle()
+        .on('error', gutil.log)
+        .pipe(source('./app/main.js' ))
+        .pipe(gulpif(!development, streamify(uglify())))
+        .pipe(gulp.dest("./build/"))
+        .pipe(gulpif(development, livereload())) // It notifies livereload about a change if you use it
+        .pipe(notify(function () {
+          console.log('APP bundle built in ' + (Date.now() - start) + 'ms');
+        }));
+    };
+
+
+    /* When we are developing we want to watch for changes and
+    trigger a rebundle */
+    if (options.development) {
+      appBundler = watchify(appBundler);
+      appBundler.on('update', rebundle);
+    }
+    
+    // And trigger the initial bundling
+    rebundle();
+
+
+    // var watcher  = watchify(bundler);
+});
 
 
 //HTML
-
-// gulp.task("html", function() {
-//   gulp.src("app/*.html").pipe($.useref()).pipe(gulp.dest("dist")).pipe $.size()
-// });
+gulp.task("html", function() {
+  gulp.src("app/html/**/*.html", { base: "./app/"})
+  // .pipe($.useref())
+  .pipe(gulp.dest("build"))
+  // .pipe $.size()
+});
 
 
 // Images
@@ -155,7 +212,6 @@ gulp.task('bundle', function () {
 
     bundle(bundler);  // Chain other options -- sourcemaps, rename, etc.
 });
-
 
 
 
@@ -190,32 +246,8 @@ gulp.task("sass", function() {
     // .resume();  // http://sassdoc.com/gulp/#drain-event
     // .pipe(browserSync.stream())                       // TODO: what 
 });
-/*
-gulp.task("sass", function() {
-   gulp.src(paths.src)
-    .pipe(gulpif(!global.production, sourcemaps.init()))   // TODO: env test
-    .pipe(sass(config.tasks.css.sass))
-   
-    .pipe(autoprefixer(config.tasks.css.autoprefixer))
-    .pipe(gulpif(global.production, cssnano({autoprefixer: false})))
-    .pipe(gulpif(!global.production, sourcemaps.write()))
-    .pipe(gulp.dest(paths.dest))
-    
-}
-
-});  */
 
 
-gulp.task("tell_env", function() {
-   console.log(global.production);
-});
-
-  
-gulp.task('sass:watch', function () {
-  var inputFiles = path.join(config.root.src, config.tasks.css.src, '/**/*.{' + config.tasks.css.extensions + '}');
-
-  gulp.watch(inputFiles, ['sass']);
-});
 
 
 
@@ -223,7 +255,8 @@ gulp.task('sass:watch', function () {
 gulp.task('express', function() {
   var express = require('express');
   var app = express();  //  TypeError: express is not a function
-  app.use(express.static(__dirname));
+  console.log("------------------ " + __dirname);
+  app.use(express.static('./build'));
   app.listen(4000, '0.0.0.0');
 });
 
