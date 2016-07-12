@@ -113,26 +113,12 @@ gulp.task('clean', function (cb) {
 });
 
 
-// build
-gulp.task("build", [
-  "html",
-  //"buildBundle",
-  "images",
-  "fonts",
-  "extras"
-], function(){
-  gulp.src("dist/scripts/app.js")
-  .pipe(uglify())
-  .pipe(stripDebug())
-  .dest("dist/scripts")
-});
-
-
 // watch
 gulp.task("watch", function() {
   gulp.watch('./app/stylesheets/**/*.scss', ['sass']);
-  gulp.watch('./app/javascripts/**/*.js', ['browserify'])
-  gulp.watch('./app/*.js', ['browserify']) 
+  gulp.watch('./app/javascripts/**/*.js', ['browserify']);
+  gulp.watch('./app/*.js', ['browserify']);
+  gulp.watch('./app/html/*.html', ['browserify']);
 });
 
 
@@ -163,19 +149,15 @@ gulp.task('browserify',  function(options) {
         }));
     };
 
-
     /* When we are developing we want to watch for changes and
     trigger a rebundle */
-    if (options.development) {
+    if (development) {
       appBundler = watchify(appBundler);
       appBundler.on('update', rebundle);
     }
     
     // And trigger the initial bundling
     rebundle();
-
-
-    // var watcher  = watchify(bundler);
 });
 
 
@@ -200,17 +182,6 @@ gulp.task("html", function() {
 // gulp.task "fonts", ->
 //   gulp.src(require("main-bower-files")(filter: "**/*.{eot,svg,ttf,woff,woff2}").concat("app/fonts/**/*")).pipe gulp.dest("dist/fonts")
   
-
-
-
-gulp.task('bundle', function () {
-    var bundler = browserify(config.tasks.js.src)  // Pass browserify the entry point
-                                .transform(coffeeify)      //  Chain transformations: First, coffeeify . . .
-                                .transform(babelify, { presets : [ 'es2015' ] });  // Then, babelify, with ES2015 preset
-
-    bundle(bundler);  // Chain other options -- sourcemaps, rename, etc.
-});
-
 
 
 // style 
