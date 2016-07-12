@@ -220,12 +220,12 @@ gulp.task('sass:watch', function () {
 
 
 // Development
-// gulp.task('express', function() {
-//   var express = require('express');
-//   var app = express();  //  TypeError: express is not a function
-//   app.use(express.static(__dirname));
-//   app.listen(4000, '0.0.0.0');
-// });
+gulp.task('express', function() {
+  var express = require('express');
+  var app = express();  //  TypeError: express is not a function
+  app.use(express.static(__dirname));
+  app.listen(4000, '0.0.0.0');
+});
 
 
 
