@@ -118,9 +118,8 @@ gulp.task("watch", function() {
   gulp.watch('./app/stylesheets/**/*.scss', ['sass']);
   gulp.watch('./app/javascripts/**/*.js', ['browserify']);
   gulp.watch('./app/*.js', ['browserify']);
-  gulp.watch('./app/html/*.html', ['browserify']);
+  gulp.watch('./app/html/*.html', ['html']); // Q: not working? A: 
 });
-
 
 
 gulp.task('browserify',  function(options) {
