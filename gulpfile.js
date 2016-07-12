@@ -4,11 +4,11 @@
 "use strict";
 
 var  browserify = require('browserify'),   //babelify   = require('babelify'),
+        browserSync = require("browser-sync"),
         //buffer     = require('vinyl-buffer'),
         //coffeeify  = require('coffeeify'),
         del        = require('del'),
         fs         = require('graceful-fs'),
-
         gulp       = require('gulp'),
         autoprefixer = require('gulp-autoprefixer'),
         gutil      = require('gulp-util'),
@@ -16,11 +16,16 @@ var  browserify = require('browserify'),   //babelify   = require('babelify'),
         rename     = require('gulp-rename'),
         sass       = require('gulp-sass'),
         //sassdoc    = require('sassdoc');
-        //source     = require('vinyl-source-stream'),
+        source     = require('vinyl-source-stream'),
         sourceMaps = require('gulp-sourcemaps'),
         path       = require('path'),
-        watchify   = require('watchify');
+        reqDir     = require('require-dir'),
+        watchify   = require('watchify'),
+        reload = browserSync.reload;
 
+// require config file
+// var config = require('./config.js'); // TODO: required json file import
+// TODO: for the sake of simplicity, put config in gulpfile.js for the moment.
 var config = {
     root: {
         src : './app',
@@ -56,6 +61,16 @@ var config = {
     }   
 };
 
+// production/development environment inspection
+var env = !gutil.env.production? "Development" : "Production";
+console.log("Building for :  ----  " + env + "  ----");
+
+
+// for later even more complex task, or just moving tasks into separate files
+// tasks = reqDir('tasks/');  TODO: not working, due to 'require config file' needs seperate json config file which 
+
+
+
 // Single main.js demo
 // This method makes it easy to use common bundling options in different tasks
 function bundle (bundler) {
@@ -75,6 +90,64 @@ function bundle (bundler) {
 }
 
 
+// default task
+gulp.task("default", [ "clean", "build" ]); //  ,"jest"
+
+
+// clean 
+gulp.task('clean', function (cb) {
+  del("./build/").then(function (paths) {
+    fs.mkdirSync("build");
+    //fs.mkdirSync(["build/stylesheets","build/javascripts", "build/images"]);  // Q: array not working
+    cb();
+  })
+});
+
+
+// build
+gulp.task("build", [
+  "html",
+  "buildBundle",
+  "images",
+  "fonts",
+  "extras"
+], function(){
+  gulp.src("dist/scripts/app.js")
+  .pipe(uglify())
+  .pipe(stripDebug())
+  .dest("dist/scripts")
+});
+
+
+
+
+
+//HTML
+
+// gulp.task("html", function() {
+//   gulp.src("app/*.html").pipe($.useref()).pipe(gulp.dest("dist")).pipe $.size()
+// });
+
+
+// Images
+
+// gulp.task "images", ->
+//   gulp.src("app/images/**/*").pipe($.cache($.imagemin(
+//     optimizationLevel: 3
+//     progressive: true
+//     interlaced: true))).pipe(gulp.dest("dist/images")).pipe $.size()
+
+// # Fonts
+
+// gulp.task "fonts", ->
+  
+//   gulp.src(require("main-bower-files")(filter: "**/*.{eot,svg,ttf,woff,woff2}").concat("app/fonts/**/*")).pipe gulp.dest("dist/fonts")
+  
+
+
+
+
+
 gulp.task('bundle', function () {
     var bundler = browserify(config.tasks.js.src)  // Pass browserify the entry point
                                 .transform(coffeeify)      //  Chain transformations: First, coffeeify . . .
@@ -85,13 +158,9 @@ gulp.task('bundle', function () {
 
 
 
-// Common taskss
-gulp.task('clean', function (cb) {
-  del([config.root.dest]).then(function (paths) {
-    fs.mkdirSync(config.root.dest);
-    cb();
-  })
-});
+
+// style 
+gulp.task("styles", ["sass", "moveCss"]);
 
 
 // Ref, https://www.sitepoint.com/simple-gulpy-workflow-sass/
@@ -113,8 +182,8 @@ gulp.task("sass", function() {
     .src(inputFiles)
     .pipe(sourceMaps.init())
     .pipe(sass(sassOptions).on('error', sass.logError))
-    //.pipe(sourceMaps.write(config.tasks.css.mapDir))
     .pipe(autoprefixer(autoprefixerOptions))
+    .pipe(sourceMaps.write(config.tasks.css.mapDir)) // NOTE: this line should appear just before 'gulp.dest'
     .pipe(gulp.dest(dest))
     // .pipe(sassdoc())
     // .resume();  // http://sassdoc.com/gulp/#drain-event
@@ -132,9 +201,23 @@ gulp.task("sass", function() {
     .pipe(browserSync.stream())                       // TODO: what 
 }
 
-
-
 });  */
+
+
+// TODO: can it be minify?
+gulp.task("moveCss", function() {
+  // the base option sets the relative root for the set of files,
+  // preserving the folder structure
+  return gulp.src([ "./app/stylesheets/**/*.css" ], {base: "./app/stylesheets/"} )
+  .pipe(gulp.dest("./build/stylesheets"));
+});
+  
+  
+
+
+
+
+
 gulp.task('sass:watch', function () {
   var inputFiles = path.join(config.root.src, config.tasks.css.src, '/**/*.{' + config.tasks.css.extensions + '}');
 
