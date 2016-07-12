@@ -142,7 +142,7 @@ gulp.task('browserify',  function(options) {
         entries: ['./app/main.js'], // Only need initial file, browserify finds the deps
         transform: [], // reactify : We want to convert JSX to normal javascript
         debug: !production,
-        paths: ['./app/js/'],
+        paths: ['./app/'],
         cache: {}, packageCache: {}, fullPaths: true // Requirement of watchify
     });
 
@@ -154,7 +154,7 @@ gulp.task('browserify',  function(options) {
       console.log('Building APP bundle');
       appBundler.bundle()
         .on('error', gutil.log)
-        .pipe(source('./app/main.js' ))
+        .pipe(source('main.js' ))
         .pipe(gulpif(!development, streamify(uglify())))
         .pipe(gulp.dest("./build/"))
         .pipe(gulpif(development, livereload())) // It notifies livereload about a change if you use it
