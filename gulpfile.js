@@ -7,7 +7,7 @@
 // Required
 // ///////////////////////////////////////////////
 var browserify = require('browserify'),
-    browserSync= require("browser-sync").create(),
+    browserSync= require("browser-sync"),
     buffer     = require('vinyl-buffer'),
     //coffeeify  = require('coffeeify'),
     del        = require('del'),
@@ -97,7 +97,7 @@ var development = !production
 
 
 // default task
-gulp.task('default', ['html',  'express', 'browserify',  'watch', 'browser-sync']);  //'js', 
+gulp.task('default', ['html',  'js',  'watch', 'browser-sync']);  //'express'
 
 
 
@@ -120,7 +120,7 @@ gulp.task("watch", function() {
 });
 
 
-gulp.task('browserify',  function(options) {
+gulp.task('js',  function(options) {
     var appBundler = browserify({
         entries: ['./app/main.js'], // Only need initial file, browserify finds the deps
         transform: [], // reactify : We want to convert JSX to normal javascript
@@ -136,9 +136,19 @@ gulp.task('browserify',  function(options) {
       var start = Date.now();
       console.log('Building APP bundle');
       appBundler.bundle()
-        .on('error', gutil.log)
+        // log errors if they happen
+        .on('error', gutil.log.bind(gutil, gutil.colors.red(
+           '\n\n*********************************** \n' +
+          'BROWSERIFY ERROR:' +
+          '\n*********************************** \n\n'
+          )))
         .pipe(source('main.js' ))   // Q: tried sourceFile
-        .pipe(gulpif(!development, streamify(uglify())))
+        .pipe(buffer())
+        .pipe(gulpif( production, streamify(uglify())))
+        .pipe(gulpif( production, sourceMaps.init({loadMaps: true})))
+        .pipe(gulpif( development, sourceMaps.write("./build/maps")))
+        .pipe(rename({suffix: '.min'}))
+        .pipe(uglify())
         .pipe(gulp.dest("./build/"))
         .pipe(gulpif(development, livereload())) // It notifies livereload about a change if you use it
         .pipe(notify(function () {
@@ -199,10 +209,10 @@ gulp.task("sass", function() {
 
   return gulp
     .src(inputFiles)
-    .pipe(gulpif(!production, sourceMaps.init()))
+    .pipe(gulpif( development, sourceMaps.init()))
     .pipe(sass(sassOptions).on('error', sass.logError))
     .pipe(autoprefixer(autoprefixerOptions))
-    .pipe(gulpif(!production, sourceMaps.write(config.tasks.css.mapDir))) // NOTE: this line should appear just before 'gulp.dest'
+    .pipe(gulpif( development, sourceMaps.write(config.tasks.css.mapDir))) // NOTE: this line should appear just before 'gulp.dest'
     .pipe(rename({suffix: '.min'}))
     .pipe(minifycss())
     .pipe(gulp.dest(dest))
@@ -214,18 +224,18 @@ gulp.task("sass", function() {
 
 
 gulp.task('browser-sync', function () {
-  browserSync.init({
+  browserSync({
     server: {
       baseDir: './build/',
       routes: {
-        "/" : "./html/index.htm"
+        "/" : "./html/index.htm"   // TODO: not serving from path /html/index.html
       }
     },
   });
 });
 
 
-// Development
+// Extra
 gulp.task('express', function() {
   var express = require('express');
   var app = express();  //  TypeError: express is not a function
