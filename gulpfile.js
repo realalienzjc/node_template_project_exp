@@ -116,7 +116,7 @@ gulp.task('clean', function (cb) {
 // build
 gulp.task("build", [
   "html",
-  "buildBundle",
+  //"buildBundle",
   "images",
   "fonts",
   "extras"
@@ -131,8 +131,8 @@ gulp.task("build", [
 // watch
 gulp.task("watch", function() {
   gulp.watch('./app/stylesheets/**/*.scss', ['sass']);
-  gulp.watch('./app/javascripts/**/*.js', [''])
-  gulp.watch('./app/*.js', ['']) 
+  gulp.watch('./app/javascripts/**/*.js', ['browserify'])
+  gulp.watch('./app/*.js', ['browserify']) 
 });
 
 
@@ -142,7 +142,7 @@ gulp.task('browserify',  function(options) {
         entries: ['./app/main.js'], // Only need initial file, browserify finds the deps
         transform: [], // reactify : We want to convert JSX to normal javascript
         debug: !production,
-        paths: ['./app/'],
+        paths: ['./app/'],  //  to avoid copying ./app into ./build/app
         cache: {}, packageCache: {}, fullPaths: true // Requirement of watchify
     });
 
@@ -154,7 +154,7 @@ gulp.task('browserify',  function(options) {
       console.log('Building APP bundle');
       appBundler.bundle()
         .on('error', gutil.log)
-        .pipe(source('main.js' ))
+        .pipe(source('main.js' ))   // Q: tried sourceFile
         .pipe(gulpif(!development, streamify(uglify())))
         .pipe(gulp.dest("./build/"))
         .pipe(gulpif(development, livereload())) // It notifies livereload about a change if you use it
@@ -189,7 +189,6 @@ gulp.task("html", function() {
 
 
 // Images
-
 // gulp.task "images", ->
 //   gulp.src("app/images/**/*").pipe($.cache($.imagemin(
 //     optimizationLevel: 3
@@ -199,7 +198,6 @@ gulp.task("html", function() {
 // # Fonts
 
 // gulp.task "fonts", ->
-  
 //   gulp.src(require("main-bower-files")(filter: "**/*.{eot,svg,ttf,woff,woff2}").concat("app/fonts/**/*")).pipe gulp.dest("dist/fonts")
   
 
@@ -249,13 +247,10 @@ gulp.task("sass", function() {
 
 
 
-
-
 // Development
 gulp.task('express', function() {
   var express = require('express');
   var app = express();  //  TypeError: express is not a function
-  console.log("------------------ " + __dirname);
   app.use(express.static('./build'));
   app.listen(4000, '0.0.0.0');
 });

@@ -37,6 +37,7 @@
     "minifyify": "^7.3.2",
     "require-dir": "0.3.0",
     "uglifyjs": "",
+    "underscore": "^1.8.3",
     "vinyl-buffer": "^1.0.0",
     "watchify": "^3.7.0"
   },
