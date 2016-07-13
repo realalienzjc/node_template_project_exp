@@ -9,6 +9,7 @@
 var browserify = require('browserify'),
     browserSync= require("browser-sync"),
     buffer     = require('vinyl-buffer'),
+    flatten = require('gulp-flatten'),
     //coffeeify  = require('coffeeify'),
     del        = require('del'),
     fs         = require('graceful-fs'),
@@ -97,7 +98,7 @@ var development = !production
 
 
 // default task
-gulp.task('default', ['html',  'js',  'watch', 'browser-sync']);  //'express'
+gulp.task('default', ['html', 'style', 'js',  'watch', 'browser-sync']);  //'express'
 
 
 
@@ -197,23 +198,19 @@ gulp.task("html", function() {
 //     interlaced: true))).pipe(gulp.dest("dist/images")).pipe $.size()
 
 // # Fonts
-
-// gulp.task "fonts", ->
-//   gulp.src(require("main-bower-files")(filter: "**/*.{eot,svg,ttf,woff,woff2}").concat("app/fonts/**/*")).pipe gulp.dest("dist/fonts")
-  
+gulp.task('copy-fonts', function() {
+  files = glob.sync('app/font/**/*.{ttf,woff,eof,svg}');
+  gulp.src(files)
+  .pipe(gulp.dest('./build/fonts'));
+});
 
 // style 
 gulp.task("style", ['sass', 'copy-css']);
 
 gulp.task("copy-css", function(){
-    gulp.src('/**/*.css')
+    gulp.src('app/style/**/*.css')
     .pipe(flatten())
     .pipe(gulp.dest('./build/css'));
-});
-
-
-gulp.task('copy-fonts', function() {
-
 });
 
 
@@ -239,7 +236,8 @@ gulp.task("sass", function() {
       }))
     .pipe(minifycss())
     .pipe(rename({suffix: '.min'}))
-    .pipe(gulpif( development, sourceMaps.write("../maps"))) // NOTE: this line should appear just before 'gulp.dest'
+    .pipe(flatten())
+    .pipe(gulpif( development, sourceMaps.write("../maps"))) // NOTE: this line should appear just before 'gulp.dest' and after 'flatten'
     .pipe(gulp.dest(dest))
     .pipe(browserSync.reload({ stream: true }));
     // .pipe(sassdoc())
