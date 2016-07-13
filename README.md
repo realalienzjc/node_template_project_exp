@@ -15,6 +15,12 @@ npm install
 
 ## TODO
 
+* TODO: react code, transforming
+
+* TODO: multiple scss files preprocess
+
+* TODO: clean sass, scss cache folders
+
 
 * TODO:  concat files, js, css or whatever
   REF: http://stackoverflow.com/questions/24100357/html-reloading-using-browsersync-in-gulp

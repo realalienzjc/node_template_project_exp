@@ -23,6 +23,7 @@ var browserify = require('browserify'),
     notify     = require('gulp-notify'),
     rename     = require('gulp-rename'),
     sass       = require('gulp-sass'),
+    scss       = require('gulp-scss'),
     streamify  = require('gulp-streamify'),
     uglify     = require('gulp-uglify'),
     //sassdoc    = require('sassdoc');
@@ -216,8 +217,8 @@ gulp.task("sass", function() {
   gulp
     .src('app/style/scss/**/*.{sass,scss}')
     .pipe(gulpif( development, sourceMaps.init()))
-    .pipe(gulpif( production, sass({ outputStyle: 'compressed' }),
-        sass({ outputStyle: 'expanded' })))
+    .pipe(gulpif( production, scss(),  //sass({ outputStyle: 'compressed' })
+        scss()))   //  sass({ outputStyle: 'expanded' })    // TODO: any options for scss's outputStyle
     .on('error', gutil.log.bind(gutil, gutil.colors.red(
          '\n\n*********************************** \n' +
         'SASS ERROR:' +
