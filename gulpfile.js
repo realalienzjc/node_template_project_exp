@@ -26,12 +26,14 @@ var browserify = require('browserify'),
     scss       = require('gulp-scss'),
     streamify  = require('gulp-streamify'),
     uglify     = require('gulp-uglify'),
+    imagemin   = require('gulp-imagemin'),
     //sassdoc    = require('sassdoc');
     source     = require('vinyl-source-stream'),
     sourceMaps = require('gulp-sourcemaps'),
     path       = require('path'),
     reqDir     = require('require-dir'),
-    watchify   = require('watchify');
+    watchify   = require('watchify'),
+    runSequence= require('run-sequence');
 
 
 // ////////////////////////////////////////////////
@@ -93,7 +95,7 @@ var development = !production
 
 
 // default task
-gulp.task('default', ['html', 'style', 'js',  'watch', 'browser-sync']);  //'express'
+gulp.task('default', ['watch', 'browser-sync']);  //'express'
 
 // clean 
 gulp.task('clean', function (cb) {
@@ -106,36 +108,44 @@ gulp.task('clean', function (cb) {
 
 // watch
 gulp.task("watch", function() {
-  gulp.watch('./app/js/**/*.js', ['js']);
-  gulp.watch('./app/*.js', ['js']);
+  gulp.watch('./app/js/vendor/**/**.js', ['vendor-js']);
+  gulp.watch(['./app/js/**/*.js', '!./app/js/vendor/**/*.js'], ['main-js']);
 
   gulp.watch('./app/style/css/**/*.css', ['copy-css']);
   gulp.watch('./app/style/**/*.scss', ['scss']);
 
   gulp.watch('./app/html/*.html', ['html']);
+
+  // images, fonts, etc
 });
 
 // browser-sync
 gulp.task('browser-sync', ['js', 'html', 'style'], function () {
-  browserSync(['./build/css/**/*.css', './build/js/**/*.js', './build/html/**/*.html'], {
+  // NOTE: if added '['./build/css/**/*.css', './build/js/**/*.js', './build/html/**/*.html'],' 
+  // before options of browserSync, 
+  browserSync({
     server: {
       baseDir: './build/',
       routes: {
-        "/" : "./html/index.htm"   // TODO: not serving from path /html/index.html
+        "/" : "./html/index.html"   // TODO: not serving from path /html/index.html
       }
     },
   });
 });
 
 // javascript
-gulp.task('js', ['vendor-js', 'main-js']);
+gulp.task('js', function(){
+  // NOTE: if use steps dependencies, the BrowserSync in the default task will not be carried out!
+  runSequence('vendor-js', 'main-js'); 
+}); 
 
 gulp.task('vendor-js', function(){
   gulp.src([
           'app/js/vendor/**/*.js',
       ])
-    // .pipe(concat('allJs.js'))
-    // .pipe(uglify())
+    // .pipe(concat('allVendorJs.js'))    // TIP: uncomment if necessary
+    // .pipe(rename({suffix: '.min'}))
+    .pipe(gulpif(production,uglify()))
     .pipe(gulp.dest('./build/js/'));
 });
 
@@ -164,7 +174,7 @@ gulp.task('main-js',  function(options) {
         .pipe(source('main.js' ))   // Q: tried sourceFile
         .pipe(buffer())
         .pipe(rename({suffix: '.min'}))
-        .pipe(uglify().on('error', gutil.log)) // .pipe(gulpif( production, streamify(uglify())))
+        .pipe(gulpif( production, uglify().on('error', gutil.log))) // .pipe(gulpif( production, streamify(uglify())))
         .pipe(gulpif( development, sourceMaps.init({loadMaps: true}))) // NOTE: map file has to be generated after uglifys
         .pipe(gulpif( development, sourceMaps.write("./maps")))
         .pipe(gulp.dest("./build/"))
@@ -195,11 +205,12 @@ gulp.task("html", function() {
 
 
 // Images
-// gulp.task "images", ->
-//   gulp.src("app/images/**/*").pipe($.cache($.imagemin(
-//     optimizationLevel: 3
-//     progressive: true
-//     interlaced: true))).pipe(gulp.dest("dist/images")).pipe $.size()
+gulp.task('images', function() {
+  gulp.src('app/images/**/*.*')
+    .pipe(imagemin())
+    .pipe(gulp.dest('build/images'))
+    .pipe(notify({ message: 'Image task complete!' }));
+});
 
 // # Fonts
 gulp.task('copy-fonts', function() {
@@ -254,10 +265,62 @@ gulp.task("scss", function() {
 // ////////////////////////////////////////////////
 // Extra 
 // ///////////////////////////////////////////////
+
+// load express server
 gulp.task('express', function() {
   var express = require('express');
   var app = express();
   app.use(express.static('./build'));
   app.listen(4000, '0.0.0.0');
 });
+
+// concat all vendor js ( or with main.min.js) into one file
+// REF. http://stackoverflow.com/questions/31011717/gulp-concat-and-uglify-files-and-concat-with-vendor
+gulp.task('vendor-js-concat', function() {
+  gulp.src([
+          './app/js/vendor/**/*.js'
+      ])
+    .pipe(concat('vendor.js'))
+    .pipe(uglify())
+    .pipe(rename({suffix:".min"}))
+    .pipe(gulp.dest('./build/js/'));
+});
+gulp.task('allJs', ['vendor-js-concat'], function() {
+    gulp.src([
+          './build/js/vendor.js',
+          './build/js/main.min.js'
+      ])
+    .pipe(concat('allJs.js'))
+    .pipe(gulp.dest('./build/js/'));
+})
+
+//  NOT WORKING
+// // run a local server and open target page
+// // REF: http://stackoverflow.com/questions/35075353/getting-error-when-using-default-task-in-gulp-shows-the-following-error-in-gitb
+// var connect = require('gulp-connect');  // Runs a local dev server
+// var open = require('gulp-open');    // Open a URL in a web browser
+// var config1 = {
+//   port: 9005,
+//   devBaseUrl: 'http://localhost',
+//   paths: {
+//       html:  './html/*.html',
+//       dist: './build'
+//   }
+// }
+
+// gulp.task('connect', function(){  
+//   connect.server({
+//     root: config1.paths.dist,
+//     port: config1.port,
+//     base: config1.devBaseUrl,
+//     livereload: true
+//   });
+// });
+
+
+// gulp.task('open-page',['connect'], function(){ 
+//   gulp.src('./build/html/index.html')
+//     .pipe(open());
+// });
+
 
