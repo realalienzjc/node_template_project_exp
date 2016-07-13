@@ -59,7 +59,6 @@ gulp.task('default', [ 'browser-sync']);  //'express', 'watch'
 gulp.task('clean', function (cb) {
   del("./build/").then(function (paths) {
     fs.mkdirSync("build");
-    //fs.mkdirSync(["build/stylesheets","build/javascripts", "build/images"]);  // Q: array not working
     cb();
   })
 });
@@ -78,6 +77,8 @@ gulp.task("watch", function() {
   gulp.watch('./app/html/*.html', ['html']);
 
   // images, fonts, etc
+
+
 });
 
 // browser-sync
@@ -94,6 +95,11 @@ gulp.task('browser-sync', ['build', 'watch'], function () {
   });
 });
 
+
+gulp.task('browsersync-reload', function () {
+    browserSync.reload({ stream: true })
+});
+
 // javascript
 gulp.task('js', function(){
   // NOTE: if use steps dependencies, the BrowserSync in the default task will not be carried out!
@@ -107,7 +113,8 @@ gulp.task('vendor-js', function(){
     // .pipe(concat('allVendorJs.js'))    // TIP: uncomment if necessary
     // .pipe(rename({suffix: '.min'}))
     .pipe(gulpif(production,uglify()))
-    .pipe(gulp.dest('./build/js/'));
+    .pipe(gulp.dest('./build/js/'))
+    .pipe(browserSync.reload({ stream: true }));
 });
 
 gulp.task('main-js',  function(options) {
@@ -162,7 +169,7 @@ gulp.task('main-js',  function(options) {
 //HTML
 gulp.task("html", function() {
   gulp.src("app/html/**/*.html", { base: "./app/"})
-  .pipe(gulp.dest("build"))
+  .pipe(gulp.dest("build"));
   .pipe(browserSync.reload({ stream: true }));
 });
 
@@ -172,7 +179,7 @@ gulp.task('images', function() {
   gulp.src('app/images/**/*.*')
     .pipe(imagemin())
     .pipe(gulp.dest('build/images'))
-    .pipe(notify({ message: 'Image task complete!' }));
+    .pipe(browserSync.reload({ stream: true }));
 });
 
 // # Fonts

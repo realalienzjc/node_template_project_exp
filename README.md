@@ -25,6 +25,10 @@ npm install
 * TODO: TROUBLE_SHOOTING, gulp-sass not installed correctly using 'npm install gulp-sass --save-dev'
 
 
+* TODO: in asset(html, css, javascript) building, try to refactor the 'browserSync.reload({ stream: true })' out of each task.
+* Q: In 'watch' task, why 'browser-sync reload' is executed before 'html' changes?
+  A: 
+
 
 * SUG: research to find a way (e.g. interactive session or a config file with commenting/uncommenting) in order to generate least possible node modules inside package.json
 
@@ -45,6 +49,9 @@ npm install
 
 * DONE: clean sass, scss cache folders
   NOTE: no need to clean, just for fast rebuilding.
+
+
+
 
 ## Q & A
 
