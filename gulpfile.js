@@ -210,9 +210,9 @@ gulp.task("sass", function() {
       browsers: ['last 3 version'], 
       cascade: false
       }))
-    .pipe(gulpif( development, sourceMaps.write("./build/maps"))) // NOTE: this line should appear just before 'gulp.dest'
-    .pipe(rename({suffix: '.min'}))
     .pipe(minifycss())
+    .pipe(rename({suffix: '.min'}))
+    .pipe(gulpif( development, sourceMaps.write("../maps"))) // NOTE: this line should appear just before 'gulp.dest'
     .pipe(gulp.dest(dest))
     .pipe(browserSync.reload({ stream: true }));
     // .pipe(sassdoc())
