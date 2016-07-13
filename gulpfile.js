@@ -1,36 +1,42 @@
 // gulpfile.js
-// Heavily inspired by Mike Valstar's solution:
-//   http://mikevalstar.com/post/fast-gulp-browserify-babelify-watchify-react-build/
+
+
 "use strict";
 
-var  browserify = require('browserify'),   //babelify   = require('babelify'),
-        browserSync = require("browser-sync"),
-        buffer     = require('vinyl-buffer'),
-        //coffeeify  = require('coffeeify'),
-        del        = require('del'),
-        fs         = require('graceful-fs'),
-        gulp       = require('gulp'),
-        autoprefixer = require('gulp-autoprefixer'),
-        gulpif     = require('gulp-if'),
-        gutil      = require('gulp-util'),
-        livereload = require('gulp-livereload'),
-        minifycss  = require('gulp-minify-css'),
-        notify     = require('gulp-notify'),
-        rename     = require('gulp-rename'),
-        sass       = require('gulp-sass'),
-        streamify  = require('gulp-streamify'),
-        uglify     = require('gulp-uglify'),
-        //sassdoc    = require('sassdoc');
-        source     = require('vinyl-source-stream'),
-        sourceMaps = require('gulp-sourcemaps'),
-        path       = require('path'),
-        reqDir     = require('require-dir'),
-        watchify   = require('watchify'),
-        reload = browserSync.reload;
+// ////////////////////////////////////////////////
+// Required
+// ///////////////////////////////////////////////
+var browserify = require('browserify'),
+    browserSync= require("browser-sync"),
+    buffer     = require('vinyl-buffer'),
+    //coffeeify  = require('coffeeify'),
+    del        = require('del'),
+    fs         = require('graceful-fs'),
+    gulp       = require('gulp'),
+    autoprefixer = require('gulp-autoprefixer'),
+    gulpif     = require('gulp-if'),
+    gutil      = require('gulp-util'),
+    livereload = require('gulp-livereload'),
+    minifycss  = require('gulp-minify-css'),
+    notify     = require('gulp-notify'),
+    rename     = require('gulp-rename'),
+    sass       = require('gulp-sass'),
+    streamify  = require('gulp-streamify'),
+    uglify     = require('gulp-uglify'),
+    //sassdoc    = require('sassdoc');
+    source     = require('vinyl-source-stream'),
+    sourceMaps = require('gulp-sourcemaps'),
+    path       = require('path'),
+    reqDir     = require('require-dir'),
+    watchify   = require('watchify');
 
+
+// ////////////////////////////////////////////////
+// Configuration 
+// ///////////////////////////////////////////////
 // require config file
 // var config = require('./config.js'); // TODO: required json file import
-// TODO: for the sake of simplicity, put config in gulpfile.js for the moment.
+// NOTE: for the sake of simplicity, put config in gulpfile.js for the moment.
 var config = {
     root: {
         src : './app',
@@ -66,41 +72,32 @@ var config = {
     }   
 };
 
+
+// ////////////////////////////////////////////////
+// Environment 
+// ///////////////////////////////////////////////
 // production/development environment inspection,  "gulp --production" for prod. env.
 var env = gutil.env.production? "Production" : "Development" ;
 console.log("Building for :  ----  " + env + "  ----");
 var production = gutil.env.production
 var development = !production
+
+// NOTE: another way of getting env  (Ref. https://github.com/joellongie/SuperCell )
+// env = process.env.NODE_ENV;   // in package.json, {scripts: {start: NODE_ENV=production gulp}}
+
+
+
 // for later even more complex task, or just moving tasks into separate files
 // tasks = reqDir('tasks/');  TODO: not working, due to 'require config file' needs seperate json config file which 
 
 
 
-// Single main.js demo
-// This method makes it easy to use common bundling options in different tasks
-function bundle (bundler) {
-
-    // Add options to add to "base" bundler passed as parameter
-    bundler
-      .bundle()                                                        // Start bundle
-      .pipe(source(config.js.src))                        // Entry point
-      .pipe(buffer())                                               // Convert to gulp pipeline
-      .pipe(rename(config.js.outputFile))          // Rename output from 'main.js'
-                                                                              //   to 'bundle.js'
-      .pipe(sourceMaps.init({ loadMaps : true }))  // Strip inline source maps
-      .pipe(sourceMaps.write(config.tasks.js.mapDir))    // Save source maps to their
-                                                                                      //   own directory
-      .pipe(gulp.dest(config.js.outputDir))        // Save 'bundle' to build/
-      .pipe(livereload());                                       // Reload browser if relevant
-}
+// gulp.task("default", [ "clean", "build" ]); //  ,"jest"
 
 
 // default task
-gulp.task('default', ['html', 'express', 'watch', 'browserify'], function() {
+gulp.task('default', ['html',  'js',  'watch', 'browser-sync']);  //'express'
 
-});
-
-// gulp.task("default", [ "clean", "build" ]); //  ,"jest"
 
 
 // clean 
@@ -116,13 +113,13 @@ gulp.task('clean', function (cb) {
 // watch
 gulp.task("watch", function() {
   gulp.watch('./app/stylesheets/**/*.scss', ['sass']);
-  gulp.watch('./app/javascripts/**/*.js', ['browserify']);
-  gulp.watch('./app/*.js', ['browserify']);
+  gulp.watch('./app/javascripts/**/*.js', ['js']);
+  gulp.watch('./app/*.js', ['js']);
   gulp.watch('./app/html/*.html', ['html']); // Q: not working? A: 
 });
 
 
-gulp.task('browserify',  function(options) {
+gulp.task('js',  function(options) {
     var appBundler = browserify({
         entries: ['./app/main.js'], // Only need initial file, browserify finds the deps
         transform: [], // reactify : We want to convert JSX to normal javascript
@@ -138,11 +135,21 @@ gulp.task('browserify',  function(options) {
       var start = Date.now();
       console.log('Building APP bundle');
       appBundler.bundle()
-        .on('error', gutil.log)
+        // log errors if they happen
+        .on('error', gutil.log.bind(gutil, gutil.colors.red(
+           '\n\n*********************************** \n' +
+          'BROWSERIFY ERROR:' +
+          '\n*********************************** \n\n'
+          )))
         .pipe(source('main.js' ))   // Q: tried sourceFile
-        .pipe(gulpif(!development, streamify(uglify())))
+        .pipe(buffer())
+        .pipe(gulpif( production, streamify(uglify())))
+        .pipe(rename({suffix: '.min'}))
+        .pipe(uglify().on('error', gutil.log))
+        .pipe(gulpif( development, sourceMaps.init({loadMaps: true}))) // NOTE: map file has to be generated after uglifys
+        .pipe(gulpif( development, sourceMaps.write("./build/maps")))
         .pipe(gulp.dest("./build/"))
-        .pipe(gulpif(development, livereload())) // It notifies livereload about a change if you use it
+        .pipe(browserSync.reload({ stream: true })) // .pipe(livereload())// It notifies livereload about a change if you use it
         .pipe(notify(function () {
           console.log('APP bundle built in ' + (Date.now() - start) + 'ms');
         }));
@@ -163,9 +170,8 @@ gulp.task('browserify',  function(options) {
 //HTML
 gulp.task("html", function() {
   gulp.src("app/html/**/*.html", { base: "./app/"})
-  // .pipe($.useref())
   .pipe(gulp.dest("build"))
-  // .pipe $.size()
+  .pipe(browserSync.reload({ stream: true }));
 });
 
 
@@ -188,27 +194,28 @@ gulp.task("html", function() {
 // Ref, https://www.sitepoint.com/simple-gulpy-workflow-sass/
 // Ref, https://github.com/vigetlabs/gulp-starter  , sass part
 gulp.task("sass", function() {
-  var sassOptions = {
-    errLogToConsole: true,
-    outputStyle: 'expanded'
-  };
-
   var inputFiles = path.join(config.root.src, config.tasks.css.src, '/**/*.{' + config.tasks.css.extensions + '}');
   var dest = path.join(config.root.dest, config.tasks.css.dest);
 
-  var autoprefixerOptions = {
-    browsers: ['last 3 version']
-  };
-
-  return gulp
+  gulp
     .src(inputFiles)
-    .pipe(gulpif(!production, sourceMaps.init()))
-    .pipe(sass(sassOptions).on('error', sass.logError))
-    .pipe(autoprefixer(autoprefixerOptions))
-    .pipe(gulpif(!production, sourceMaps.write(config.tasks.css.mapDir))) // NOTE: this line should appear just before 'gulp.dest'
+    .pipe(gulpif( development, sourceMaps.init()))
+    .pipe(gulpif( production, sass({ outputStyle: 'compressed' }),
+        sass({ outputStyle: 'expanded' })))
+    .on('error', gutil.log.bind(gutil, gutil.colors.red(
+         '\n\n*********************************** \n' +
+        'SASS ERROR:' +
+        '\n*********************************** \n\n'
+        )))
+    .pipe(autoprefixer({
+      browsers: ['last 3 version'], 
+      cascade: false
+      }))
+    .pipe(gulpif( development, sourceMaps.write("./build/maps"))) // NOTE: this line should appear just before 'gulp.dest'
     .pipe(rename({suffix: '.min'}))
     .pipe(minifycss())
     .pipe(gulp.dest(dest))
+    .pipe(browserSync.reload({ stream: true }));
     // .pipe(sassdoc())
      // .on('error', handleErrors)                              // TODO: error handling
     // .resume();  // http://sassdoc.com/gulp/#drain-event
@@ -216,8 +223,21 @@ gulp.task("sass", function() {
 });
 
 
+gulp.task('browser-sync', function () {
+  browserSync({
+    server: {
+      baseDir: './build/',
+      routes: {
+        "/" : "./html/index.htm"   // TODO: not serving from path /html/index.html
+      }
+    },
+  });
+});
 
-// Development
+
+// ////////////////////////////////////////////////
+// Extra 
+// ///////////////////////////////////////////////
 gulp.task('express', function() {
   var express = require('express');
   var app = express();  //  TypeError: express is not a function
