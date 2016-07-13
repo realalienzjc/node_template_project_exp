@@ -209,6 +209,8 @@ gulp.task("style", ['sass', 'copy-css']);
 
 gulp.task("copy-css", function(){
     gulp.src('app/style/**/*.css')
+    .pipe(rename({suffix: '.min'}))
+    .pipe(minifycss())
     .pipe(flatten())
     .pipe(gulp.dest('./build/css'));
 });
