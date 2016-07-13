@@ -18,6 +18,8 @@ npm install
 
 * TODO: react code, transforming
 
+* TODO: make 'build' tasks not watchified! 
+
 * TODO: multiple scss files preprocess
 
 * TODO: minimize the node_modules required
@@ -87,6 +89,21 @@ gulp.src('./package.json').pipe(open({app: 'chrome'}));
 
 * Q: how to bundle vendors' javascript library? 
   A: See task 'vendor-js'.
+
+
+* Q: What's all the options for autoprefix?
+e.g. ```
+// https://webstoemp.com/blog/gulp-setup/
+var AUTOPREFIXER_BROWSERS = [
+  'last 3 versions',
+  'ie >= 8',
+  'ios >= 7',
+  'android >= 4.4',
+  'bb >= 10'
+];
+```
+  A:
+
 
 
 ## Trouble Shooting

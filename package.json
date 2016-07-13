@@ -8,9 +8,9 @@
   },
   "main": "main.js",
   "scripts": {
-    //"build": "browserify ./app/main.js  --debug | exorcist bundle.map.js  | uglifyjs  > ./build/main.min.js",
+    "build": "browserify ./app/main.js  --debug | exorcist bundle.map.js  | uglifyjs  > ./build/main.min.js",
     "clean": "rm -rf build/ && mkdir build/",
-    //"test": "echo \"Error: no test specified\" && exit 1",
+    "test": "echo \"Error: no test specified\" && exit 1",
     "serve": "beefy ./app/main.js:./build/main.min.js --browserify $(which browserify) --live",
     "setup": "npm install && npm run clean"
   },

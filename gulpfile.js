@@ -52,8 +52,10 @@ var development = !production
 // tasks = reqDir('tasks/');  TODO: not working, due to 'require config file' needs seperate json config file which 
 
 
-// default task
-gulp.task('default', [ 'browser-sync']);
+// default tasks
+gulp.task('default', ['build'] ); // just alias // TODO: still hold on watchify
+gulp.task('dev', [ 'browser-sync']); // dependencies
+
 
 // clean 
 gulp.task('clean', function (cb) {
@@ -64,7 +66,7 @@ gulp.task('clean', function (cb) {
 });
 
 //build
-gulp.task('build', ['html','js', 'style' ]) // images, font
+gulp.task('build', ['html','js', 'style' ]); // images, font
 
 // watch
 gulp.task("watch", function() {
