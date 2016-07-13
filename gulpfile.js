@@ -164,7 +164,8 @@ gulp.task('main-js',  function(options) {
     var rebundle = function () {
       var start = Date.now();
       console.log('Building APP bundle');
-      appBundler.bundle()
+      // NOTE: must 'return' to allow synchronized build before starting a server
+      return appBundler.bundle()
         // log errors if they happen
         .on('error', gutil.log.bind(gutil, gutil.colors.red(
            '\n\n*********************************** \n' +
@@ -181,6 +182,7 @@ gulp.task('main-js',  function(options) {
         .pipe(browserSync.reload({ stream: true })) // .pipe(livereload())// It notifies livereload about a change if you use it
         .pipe(notify(function () {
           console.log('APP bundle built in ' + (Date.now() - start) + 'ms'); // TODO: why prompt twice? 
+          //browserSync.reload({ stream: true });
         }));
     };
 
@@ -189,10 +191,12 @@ gulp.task('main-js',  function(options) {
     if (development) {
       appBundler = watchify(appBundler);
       appBundler.on('update', rebundle);
-    }
-    
+    } 
+
     // And trigger the initial bundling
     rebundle();
+    
+    
 });
 
 

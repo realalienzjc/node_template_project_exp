@@ -5,10 +5,10 @@ module.exports = function (values) {
 
   _.find(values, function(name) {
     if (name === 'Kara Kent') {
-      console.log('It\'s Superman');
+      console.log('It\'s Superman!');
       foundSuperman = true;
     } else {
-      console.log('... No superman');
+      console.log('... No superman!');
     }
   });
 

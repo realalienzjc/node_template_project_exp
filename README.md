@@ -55,6 +55,8 @@ npm install
 * Q: how to validate the gulp tasks? Any scriptable assertion?
   A:
 
+* Q: ``ESP`` How to ensure all tasks getting done before BrowserSync?
+  A:
 
 * Q: browser selection, 
   A:
