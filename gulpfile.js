@@ -143,9 +143,8 @@ gulp.task('js',  function(options) {
           )))
         .pipe(source('main.js' ))   // Q: tried sourceFile
         .pipe(buffer())
-        .pipe(gulpif( production, streamify(uglify())))
         .pipe(rename({suffix: '.min'}))
-        .pipe(uglify().on('error', gutil.log))
+        .pipe(uglify().on('error', gutil.log)) // .pipe(gulpif( production, streamify(uglify())))
         .pipe(gulpif( development, sourceMaps.init({loadMaps: true}))) // NOTE: map file has to be generated after uglifys
         .pipe(gulpif( development, sourceMaps.write("./build/maps")))
         .pipe(gulp.dest("./build/"))
@@ -233,17 +232,45 @@ gulp.task('browser-sync', function () {
     },
   });
 });
+<<<<<<< HEAD
 
 
 // ////////////////////////////////////////////////
 // Extra 
 // ///////////////////////////////////////////////
+=======
+
+
+// Extra
+>>>>>>> c8e3d1ea09558a777880b2b59bad5d52fe967e1f
 gulp.task('express', function() {
   var express = require('express');
   var app = express();  //  TypeError: express is not a function
   app.use(express.static('./build'));
   app.listen(4000, '0.0.0.0');
 });
+
+
+
+
+// Single main.js demo
+// This method makes it easy to use common bundling options in different tasks
+function bundle (bundler) {
+
+    // Add options to add to "base" bundler passed as parameter
+    bundler
+      .bundle()                                                        // Start bundle
+      .pipe(source(config.js.src))                        // Entry point
+      .pipe(buffer())                                               // Convert to gulp pipeline
+      .pipe(rename(config.js.outputFile))          // Rename output from 'main.js'
+                                                                              //   to 'bundle.js'
+      .pipe(sourceMaps.init({ loadMaps : true }))  // Strip inline source maps
+      .pipe(sourceMaps.write(config.tasks.js.mapDir))    // Save source maps to their
+                                                                                      //   own directory
+      .pipe(gulp.dest(config.js.outputDir))        // Save 'bundle' to build/
+      .pipe(livereload());                                       // Reload browser if relevant
+}
+
 
 
 
