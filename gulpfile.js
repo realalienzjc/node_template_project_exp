@@ -53,7 +53,7 @@ var development = !production
 
 
 // default task
-gulp.task('default', [ 'browser-sync']);  //'express', 'watch'
+gulp.task('default', [ 'browser-sync']);
 
 // clean 
 gulp.task('clean', function (cb) {
@@ -169,7 +169,7 @@ gulp.task('main-js',  function(options) {
 //HTML
 gulp.task("html", function() {
   gulp.src("app/html/**/*.html", { base: "./app/"})
-  .pipe(gulp.dest("build"));
+  .pipe(gulp.dest("build"))
   .pipe(browserSync.reload({ stream: true }));
 });
 
@@ -277,6 +277,18 @@ gulp.task('allJs', ['vendor-js-concat'], function() {
     .pipe(concat('allJs.js'))
     .pipe(gulp.dest('./build/js/'));
 })
+
+
+gulp.task('help', function(){
+    console.log("");
+    console.log("Run development, use:");
+    console.log("      gulp default");
+    console.log("Run production, use:");
+    console.log("      gulp default --production");
+    console.log("");
+    console.log("gulp --tasks   to see all available tasks.")
+    console.log("");
+});
 
 //  NOT WORKING
 // // run a local server and open target page
