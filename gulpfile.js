@@ -14,6 +14,7 @@ var browserify = require('browserify'),
     fs         = require('graceful-fs'),
     gulp       = require('gulp'),
     autoprefixer = require('gulp-autoprefixer'),
+    flatten    = require('gulp-flatten'),
     gulpif     = require('gulp-if'),
     gutil      = require('gulp-util'),
     livereload = require('gulp-livereload'),
@@ -45,18 +46,18 @@ var config = {
 
     tasks: {
       js: {
-        src: 'javascripts',       // Entry point
+        src: 'js',       // Entry point
         "entries": {
           "app": ["./main.js"]
         },
-        outputDir: 'javascripts',  // Directory to save bundle to
+        outputDir: 'js',  // Directory to save bundle to
         mapDir: './build/maps',      // Subdirectory to save maps to
         outputFile: 'bundle.js' // Name to use for bundle
       },
 
       css: {
-        src: "stylesheets",
-        dest: "stylesheets",
+        src: "style",
+        dest: "css",
         mapDir: './build/maps',
         autoprefixer: {
           browsers: ["last 3 version"]
@@ -67,7 +68,7 @@ var config = {
             "./node_modules/normalize.css"
           ]
         },
-        extensions: ["sass", "scss", "css"]
+        extensions: ["sass", "scss"]  //  , "css"
       }
     }   
 };
@@ -109,16 +110,30 @@ gulp.task('clean', function (cb) {
   })
 });
 
-
 // watch
 gulp.task("watch", function() {
-  gulp.watch('./app/stylesheets/**/*.scss', ['sass']);
-  gulp.watch('./app/javascripts/**/*.js', ['js']);
+  gulp.watch('./app/js/**/*.js', ['js']);
   gulp.watch('./app/*.js', ['js']);
-  gulp.watch('./app/html/*.html', ['html']); // Q: not working? A: 
+
+  gulp.watch('./app/style/css/**/*.css', ['copy-css']);
+  gulp.watch('./app/style/**/*.scss', ['sass']);
+
+  gulp.watch('./app/html/*.html', ['html']);
 });
 
+// browser-sync
+gulp.task('browser-sync', function () {
+  browserSync({
+    server: {
+      baseDir: './build/',
+      routes: {
+        "/" : "./html/index.htm"   // TODO: not serving from path /html/index.html
+      }
+    },
+  });
+});
 
+// javascript
 gulp.task('js',  function(options) {
     var appBundler = browserify({
         entries: ['./app/main.js'], // Only need initial file, browserify finds the deps
@@ -187,8 +202,20 @@ gulp.task("html", function() {
 //   gulp.src(require("main-bower-files")(filter: "**/*.{eot,svg,ttf,woff,woff2}").concat("app/fonts/**/*")).pipe gulp.dest("dist/fonts")
   
 
-
 // style 
+gulp.task("style", ['sass', 'copy-css']);
+
+gulp.task("copy-css", function(){
+    gulp.src('/**/*.css')
+    .pipe(flatten())
+    .pipe(gulp.dest('./build/css'));
+});
+
+
+gulp.task('copy-fonts', function() {
+
+});
+
 
 // Ref, https://www.sitepoint.com/simple-gulpy-workflow-sass/
 // Ref, https://github.com/vigetlabs/gulp-starter  , sass part
@@ -219,18 +246,6 @@ gulp.task("sass", function() {
      // .on('error', handleErrors)                              // TODO: error handling
     // .resume();  // http://sassdoc.com/gulp/#drain-event
     // .pipe(browserSync.stream())                       // TODO: what 
-});
-
-
-gulp.task('browser-sync', function () {
-  browserSync({
-    server: {
-      baseDir: './build/',
-      routes: {
-        "/" : "./html/index.htm"   // TODO: not serving from path /html/index.html
-      }
-    },
-  });
 });
 
 
