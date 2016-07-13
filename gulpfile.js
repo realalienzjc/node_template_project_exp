@@ -219,11 +219,8 @@ gulp.task("copy-css", function(){
 // Ref, https://www.sitepoint.com/simple-gulpy-workflow-sass/
 // Ref, https://github.com/vigetlabs/gulp-starter  , sass part
 gulp.task("sass", function() {
-  var inputFiles = path.join(config.root.src, config.tasks.css.src, '/**/*.{' + config.tasks.css.extensions + '}');
-  var dest = path.join(config.root.dest, config.tasks.css.dest);
-
   gulp
-    .src(inputFiles)
+    .src('app/style/scss/**/*.{sass,scss}')
     .pipe(gulpif( development, sourceMaps.init()))
     .pipe(gulpif( production, sass({ outputStyle: 'compressed' }),
         sass({ outputStyle: 'expanded' })))
@@ -240,7 +237,7 @@ gulp.task("sass", function() {
     .pipe(rename({suffix: '.min'}))
     .pipe(flatten())
     .pipe(gulpif( development, sourceMaps.write("../maps"))) // NOTE: this line should appear just before 'gulp.dest' and after 'flatten'
-    .pipe(gulp.dest(dest))
+    .pipe(gulp.dest('build/css'))
     .pipe(browserSync.reload({ stream: true }));
     // .pipe(sassdoc())
      // .on('error', handleErrors)                              // TODO: error handling
