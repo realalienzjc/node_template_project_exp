@@ -50,14 +50,14 @@ var config = {
           "app": ["./main.js"]
         },
         outputDir: 'javascripts',  // Directory to save bundle to
-        mapDir: 'javascripts.map',      // Subdirectory to save maps to
+        mapDir: './build/maps',      // Subdirectory to save maps to
         outputFile: 'bundle.js' // Name to use for bundle
       },
 
       css: {
         src: "stylesheets",
         dest: "stylesheets",
-        mapDir: 'stylesheets.map',
+        mapDir: './build/maps',
         autoprefixer: {
           browsers: ["last 3 version"]
         },
@@ -232,17 +232,12 @@ gulp.task('browser-sync', function () {
     },
   });
 });
-<<<<<<< HEAD
+
 
 
 // ////////////////////////////////////////////////
 // Extra 
 // ///////////////////////////////////////////////
-=======
-
-
-// Extra
->>>>>>> c8e3d1ea09558a777880b2b59bad5d52fe967e1f
 gulp.task('express', function() {
   var express = require('express');
   var app = express();  //  TypeError: express is not a function

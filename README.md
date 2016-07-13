@@ -23,3 +23,8 @@ npm install
 * TODO: research to find a way (e.g. interactive session or a config file with commenting/uncommenting) in order to generate least possible node modules inside package.json
 
 
+
+
+## Trouble Shooting
+ 
+* When 'npm install', node-sass hangs the installation, TODO:fix by manual build, ref, 
