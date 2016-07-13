@@ -17,9 +17,13 @@ npm install
 
 * TODO: react code, transforming
 
+* TODO: how to bundle vendors' javascript library
+
 * TODO: multiple scss files preprocess
 
 * TODO: clean sass, scss cache folders
+
+* TODO: tasks dependencies,  sequence enforcement
 
 
 * TODO:  concat files, js, css or whatever
@@ -40,4 +44,4 @@ npm install
 
 ## Trouble Shooting
  
-* When 'npm install', node-sass hangs the installation, TODO:fix by manual build, ref, 
+* When 'npm install', node-sass hangs the installation, TODO:fix by manual build, ref, ???

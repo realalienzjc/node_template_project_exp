@@ -110,13 +110,13 @@ gulp.task("watch", function() {
   gulp.watch('./app/*.js', ['js']);
 
   gulp.watch('./app/style/css/**/*.css', ['copy-css']);
-  gulp.watch('./app/style/**/*.scss', ['sass']);
+  gulp.watch('./app/style/**/*.scss', ['scss']);
 
   gulp.watch('./app/html/*.html', ['html']);
 });
 
 // browser-sync
-gulp.task('browser-sync', function () {
+gulp.task('browser-sync', ['js', 'html', 'style'], function () {
   browserSync(['./build/css/**/*.css', './build/js/**/*.js', './build/html/**/*.html'], {
     server: {
       baseDir: './build/',
@@ -128,7 +128,18 @@ gulp.task('browser-sync', function () {
 });
 
 // javascript
-gulp.task('js',  function(options) {
+gulp.task('js', ['vendor-js', 'main-js']);
+
+gulp.task('vendor-js', function(){
+  gulp.src([
+          'app/js/vendor/**/*.js',
+      ])
+    // .pipe(concat('allJs.js'))
+    // .pipe(uglify())
+    .pipe(gulp.dest('./build/js/'));
+});
+
+gulp.task('main-js',  function(options) {
     var appBundler = browserify({
         entries: ['./app/main.js'], // Only need initial file, browserify finds the deps
         transform: [], // reactify : We want to convert JSX to normal javascript
@@ -199,7 +210,7 @@ gulp.task('copy-fonts', function() {
 });
 
 // style 
-gulp.task("style", ['sass', 'copy-css']);
+gulp.task("style", ['scss', 'copy-css']);
 
 gulp.task("copy-css", function(){
     gulp.src('app/style/**/*.css')
@@ -213,7 +224,7 @@ gulp.task("copy-css", function(){
 
 // Ref, https://www.sitepoint.com/simple-gulpy-workflow-sass/
 // Ref, https://github.com/vigetlabs/gulp-starter  , sass part
-gulp.task("sass", function() {
+gulp.task("scss", function() {
   gulp
     .src('app/style/scss/**/*.{sass,scss}')
     .pipe(gulpif( development, sourceMaps.init()))
@@ -221,7 +232,7 @@ gulp.task("sass", function() {
         scss()))   //  sass({ outputStyle: 'expanded' })    // TODO: any options for scss's outputStyle
     .on('error', gutil.log.bind(gutil, gutil.colors.red(
          '\n\n*********************************** \n' +
-        'SASS ERROR:' +
+        'SCSS ERROR:' +
         '\n*********************************** \n\n'
         ))) 
     .pipe(autoprefixer({
