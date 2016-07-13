@@ -124,7 +124,7 @@ gulp.task('js',  function(options) {
         entries: ['./app/main.js'], // Only need initial file, browserify finds the deps
         transform: [], // reactify : We want to convert JSX to normal javascript
         debug: !production,
-        paths: ['./app/'],  //  to avoid copying ./app into ./build/app
+        paths: ['./app/'],  //  NOTE: to avoid copying ./app into ./build/app
         cache: {}, packageCache: {}, fullPaths: true // Requirement of watchify
     });
 
@@ -205,7 +205,7 @@ gulp.task("sass", function() {
          '\n\n*********************************** \n' +
         'SASS ERROR:' +
         '\n*********************************** \n\n'
-        )))
+        ))) 
     .pipe(autoprefixer({
       browsers: ['last 3 version'], 
       cascade: false
