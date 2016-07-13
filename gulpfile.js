@@ -33,7 +33,8 @@ var browserify = require('browserify'),
     path       = require('path'),
     reqDir     = require('require-dir'),
     watchify   = require('watchify'),
-    runSequence= require('run-sequence');
+    runSequence= require('run-sequence'),
+    zip        = require('gulp-zip');
 
 
 // ////////////////////////////////////////////////
@@ -265,6 +266,20 @@ gulp.task("scss", function() {
 });
 
 
+gulp.task('dist', function () {
+    del("./dist/").then(function (paths) {
+      fs.mkdirSync("dist");
+      //fs.mkdirSync(["build/stylesheets","build/javascripts", "build/images"]);  // Q: array not working
+      cb();
+    });
+    var timestamp = getStamp();
+    gulp.src(['./build/**', '!./build/{maps,maps/**}'])
+        .pipe(zip('dist.zip'))
+        .pipe(rename('template_project_'+timestamp+'.zip')) // SUG: read package.json for project name!
+        .pipe(gulp.dest('./dist'));
+});
+
+
 
 // ////////////////////////////////////////////////
 // Extra 
@@ -328,3 +343,19 @@ gulp.task('allJs', ['vendor-js-concat'], function() {
 // });
 
 
+// ////////////////////////////////////////////////
+// Util 
+// ///////////////////////////////////////////////
+//build datestamp for cache busting
+var getStamp = function() {
+  var myDate = new Date();
+
+  var year = myDate.getFullYear().toString(),
+    month = ('0' + (myDate.getMonth() + 1)).slice(-2),
+    day = ('0' + myDate.getDate()).slice(-2),
+    hr = myDate.getHours().toString(), 
+    min = myDate.getMinutes().toString();
+
+  var dateStr = year + month + day + "_"+hr+min;
+  return dateStr;
+};

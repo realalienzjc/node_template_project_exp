@@ -25,7 +25,8 @@ npm install
 
 * TODO: clean sass, scss cache folders
 
-* TODO: tasks dependencies,  sequence enforcement
+* TODO: make a dist task
+
 
 
 
@@ -40,6 +41,11 @@ npm install
   REF: http://stackoverflow.com/questions/24100357/html-reloading-using-browsersync-in-gulp
   HINT: http://stackoverflow.com/questions/17970845/are-there-any-disadvantages-to-concatenating-all-javascript-files-including-ven
   HINT: consider using webpack?
+
+* DONE: tasks dependencies,  sequence enforcement
+  NOTE:  use task dependency like task("task1", ["task_before_step"]) or use module 'run-sequence'
+
+
 
 
 ## Q & A
