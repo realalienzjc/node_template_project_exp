@@ -7,13 +7,13 @@ document.getElementById('response').innerHTML = text;
 // example code from https://www.sitepoint.com/getting-started-browserify/ 
 // require module
 var _ = require('underscore'),
-	names = require('./javascripts/names.js'),
-    findSuperman = require('./javascripts/findsuperman.js');
+	names = require('./js/names.js'),
+    findSuperman = require('./js/findsuperman.js');
 
 if (findSuperman(_)) {
-  document.write('We found Superman');
+  document.write('We found Superman!');
 } else {
-  document.write('No Superman...');
+  document.write('No Superman...!');
 }
 
 

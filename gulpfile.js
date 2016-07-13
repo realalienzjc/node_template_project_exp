@@ -87,20 +87,12 @@ var development = !production
 // NOTE: another way of getting env  (Ref. https://github.com/joellongie/SuperCell )
 // env = process.env.NODE_ENV;   // in package.json, {scripts: {start: NODE_ENV=production gulp}}
 
-
-
-// for later even more complex task, or just moving tasks into separate files
+// NOTE: for later even more complex tasks, or just moving tasks into separate files
 // tasks = reqDir('tasks/');  TODO: not working, due to 'require config file' needs seperate json config file which 
-
-
-
-// gulp.task("default", [ "clean", "build" ]); //  ,"jest"
 
 
 // default task
 gulp.task('default', ['html', 'style', 'js',  'watch', 'browser-sync']);  //'express'
-
-
 
 // clean 
 gulp.task('clean', function (cb) {
@@ -124,7 +116,7 @@ gulp.task("watch", function() {
 
 // browser-sync
 gulp.task('browser-sync', function () {
-  browserSync({
+  browserSync(['./build/css/**/*.css', './build/js/**/*.js', './build/html/**/*.html'], {
     server: {
       baseDir: './build/',
       routes: {
@@ -162,11 +154,11 @@ gulp.task('js',  function(options) {
         .pipe(rename({suffix: '.min'}))
         .pipe(uglify().on('error', gutil.log)) // .pipe(gulpif( production, streamify(uglify())))
         .pipe(gulpif( development, sourceMaps.init({loadMaps: true}))) // NOTE: map file has to be generated after uglifys
-        .pipe(gulpif( development, sourceMaps.write("./build/maps")))
+        .pipe(gulpif( development, sourceMaps.write("./maps")))
         .pipe(gulp.dest("./build/"))
         .pipe(browserSync.reload({ stream: true })) // .pipe(livereload())// It notifies livereload about a change if you use it
         .pipe(notify(function () {
-          console.log('APP bundle built in ' + (Date.now() - start) + 'ms');
+          console.log('APP bundle built in ' + (Date.now() - start) + 'ms'); // TODO: why prompt twice? 
         }));
     };
 
@@ -201,7 +193,8 @@ gulp.task("html", function() {
 gulp.task('copy-fonts', function() {
   files = glob.sync('app/font/**/*.{ttf,woff,eof,svg}');
   gulp.src(files)
-  .pipe(gulp.dest('./build/fonts'));
+  .pipe(gulp.dest('build/fonts'))
+  .pipe(browserSync.reload({ stream: true }));
 });
 
 // style 
@@ -212,7 +205,8 @@ gulp.task("copy-css", function(){
     .pipe(rename({suffix: '.min'}))
     .pipe(minifycss())
     .pipe(flatten())
-    .pipe(gulp.dest('./build/css'));
+    .pipe(gulp.dest('./build/css'))
+    .pipe(browserSync.reload({ stream: true }));
 });
 
 
@@ -240,9 +234,7 @@ gulp.task("sass", function() {
     .pipe(gulp.dest('build/css'))
     .pipe(browserSync.reload({ stream: true }));
     // .pipe(sassdoc())
-     // .on('error', handleErrors)                              // TODO: error handling
     // .resume();  // http://sassdoc.com/gulp/#drain-event
-    // .pipe(browserSync.stream())                       // TODO: what 
 });
 
 
@@ -252,7 +244,7 @@ gulp.task("sass", function() {
 // ///////////////////////////////////////////////
 gulp.task('express', function() {
   var express = require('express');
-  var app = express();  //  TypeError: express is not a function
+  var app = express();
   app.use(express.static('./build'));
   app.listen(4000, '0.0.0.0');
 });
