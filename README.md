@@ -6,9 +6,6 @@ Template project for quick starting a node.js based project.
 
 
 
-## Status
-
-
 
 ## Commands
 npm install
@@ -18,8 +15,19 @@ npm install
 
 ## TODO
 
-* TODO: print a list of available tasks;
+
+* TODO:  concat files, js, css or whatever
+  REF: http://stackoverflow.com/questions/24100357/html-reloading-using-browsersync-in-gulp
+
+
 * TODO: research to find a way (e.g. interactive session or a config file with commenting/uncommenting) in order to generate least possible node modules inside package.json
+
+
+## Q & A
+
+* Q: How to print a list of available tasks?   A: `gulp --tasks`
+
+* Q: Quick start video tutorials?  A: https://www.youtube.com/watch?v=BwzjYK1Hd0Y , https://www.youtube.com/watch?v=LmdT2zhFmn4&list=PLv1YUP7gO_viROuRcGsDCNM-FUVgMYb_G
 
 
 
