@@ -11,12 +11,10 @@ var _ = require('underscore'),
     findSuperman = require('./js/findsuperman.js');
 
 if (findSuperman(_)) {
-  document.write('We found Superman');
+  document.write('We found Superman!');
 } else {
-  document.write('No Superman...');
+  document.write('No Superman...!');
 }
-
-
 
 
 

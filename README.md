@@ -12,21 +12,17 @@ npm install
 
 
 
-
 ## TODO
 
 * TODO: How to launch specific path html when running a local server? 
 
 * TODO: react code, transforming
 
-* TODO: how to bundle vendors' javascript library
-
 * TODO: multiple scss files preprocess
 
-* TODO: clean sass, scss cache folders
+* TODO: minimize the node_modules required
 
-* TODO: make a dist task
-
+* TODO: TROUBLE_SHOOTING, gulp-sass not installed correctly using 'npm install gulp-sass --save-dev'
 
 
 
@@ -37,7 +33,7 @@ npm install
 
 
 * DONE: concat files, js, css or other resources files
-  NOTE: 
+  NOTE: not 
   REF: http://stackoverflow.com/questions/24100357/html-reloading-using-browsersync-in-gulp
   HINT: http://stackoverflow.com/questions/17970845/are-there-any-disadvantages-to-concatenating-all-javascript-files-including-ven
   HINT: consider using webpack?
@@ -45,8 +41,10 @@ npm install
 * DONE: tasks dependencies,  sequence enforcement
   NOTE:  use task dependency like task("task1", ["task_before_step"]) or use module 'run-sequence'
 
+* DONE: make a dist task with timestamp
 
-
+* DONE: clean sass, scss cache folders
+  NOTE: no need to clean, just for fast rebuilding.
 
 ## Q & A
 
@@ -79,6 +77,9 @@ gulp.src('./package.json').pipe(open({app: 'chrome'}));
 
 * Q: For browserSync() call, what's the point of ['./build/**/*.*'] before the options? Even the file changes, not task will be carried out except reporting file changed. IDEA: hook up event?
   A: 
+
+* Q: how to bundle vendors' javascript library? 
+  A: See task 'vendor-js'.
 
 
 ## Trouble Shooting

@@ -10,7 +10,6 @@ var browserify = require('browserify'),
     browserSync= require("browser-sync"),
     buffer     = require('vinyl-buffer'),
     flatten = require('gulp-flatten'),
-    //coffeeify  = require('coffeeify'),
     del        = require('del'),
     fs         = require('graceful-fs'),
     gulp       = require('gulp'),
@@ -38,48 +37,6 @@ var browserify = require('browserify'),
 
 
 // ////////////////////////////////////////////////
-// Configuration 
-// ///////////////////////////////////////////////
-// require config file
-// var config = require('./config.js'); // TODO: required json file import
-// NOTE: for the sake of simplicity, put config in gulpfile.js for the moment.
-var config = {
-    root: {
-        src : './app',
-        dest : './build'
-    },
-
-    tasks: {
-      js: {
-        src: 'js',       // Entry point
-        "entries": {
-          "app": ["./main.js"]
-        },
-        outputDir: 'js',  // Directory to save bundle to
-        mapDir: './build/maps',      // Subdirectory to save maps to
-        outputFile: 'bundle.js' // Name to use for bundle
-      },
-
-      css: {
-        src: "style",
-        dest: "css",
-        mapDir: './build/maps',
-        autoprefixer: {
-          browsers: ["last 3 version"]
-        },
-        sass: {
-          indentedSyntax: true,
-          includePaths: [
-            "./node_modules/normalize.css"
-          ]
-        },
-        extensions: ["sass", "scss"]  //  , "css"
-      }
-    }   
-};
-
-
-// ////////////////////////////////////////////////
 // Environment 
 // ///////////////////////////////////////////////
 // production/development environment inspection,  "gulp --production" for prod. env.
@@ -96,7 +53,7 @@ var development = !production
 
 
 // default task
-gulp.task('default', ['watch', 'browser-sync']);  //'express'
+gulp.task('default', [ 'browser-sync']);  //'express', 'watch'
 
 // clean 
 gulp.task('clean', function (cb) {
@@ -106,6 +63,9 @@ gulp.task('clean', function (cb) {
     cb();
   })
 });
+
+//build
+gulp.task('build', ['html','js', 'style' ]) // images, font
 
 // watch
 gulp.task("watch", function() {
@@ -121,9 +81,9 @@ gulp.task("watch", function() {
 });
 
 // browser-sync
-gulp.task('browser-sync', ['js', 'html', 'style'], function () {
-  // NOTE: if added '['./build/css/**/*.css', './build/js/**/*.js', './build/html/**/*.html'],' 
-  // before options of browserSync, 
+gulp.task('browser-sync', ['build', 'watch'], function () {
+  // NOTE: if adding '['./build/css/**/*.css', './build/js/**/*.js', './build/html/**/*.html'],' 
+  // before options of browserSync, then server will detec
   browserSync({
     server: {
       baseDir: './build/',
@@ -196,8 +156,6 @@ gulp.task('main-js',  function(options) {
 
     // And trigger the initial bundling
     rebundle();
-    
-    
 });
 
 
@@ -342,6 +300,49 @@ gulp.task('allJs', ['vendor-js-concat'], function() {
 //     .pipe(open());
 // });
 
+
+// ////////////////////////////////////////////////
+// Configuration  (NOT IN USE)
+// * trade string duplicaton for tasks readability, 
+// * refactor string into config later once gulefile.js is stable)
+// ///////////////////////////////////////////////
+// require config file
+// var config = require('./config.js'); // TODO: required json file import
+// NOTE: for the sake of simplicity, put config in gulpfile.js for the moment.
+var config = {
+    root: {
+        src : './app',
+        dest : './build'
+    },
+
+    tasks: {
+      js: {
+        src: 'js',       // Entry point
+        "entries": {
+          "app": ["./main.js"]
+        },
+        outputDir: 'js',  // Directory to save bundle to
+        mapDir: './build/maps',      // Subdirectory to save maps to
+        outputFile: 'bundle.js' // Name to use for bundle
+      },
+
+      css: {
+        src: "style",
+        dest: "css",
+        mapDir: './build/maps',
+        autoprefixer: {
+          browsers: ["last 3 version"]
+        },
+        sass: {
+          indentedSyntax: true,
+          includePaths: [
+            "./node_modules/normalize.css"
+          ]
+        },
+        extensions: ["sass", "scss"]  //  , "css"
+      }
+    }   
+};
 
 // ////////////////////////////////////////////////
 // Util 
