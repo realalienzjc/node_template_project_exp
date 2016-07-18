@@ -1,5 +1,5 @@
 // gulpfile.js
-
+// HINT: For more recipes, https://github.com/gulpjs/gulp/tree/master/docs/recipes
 
 "use strict";
 
@@ -69,14 +69,15 @@ gulp.task('clean', function (cb) {
 gulp.task('build', ['html','js', 'style' ]); // images, font
 
 // watch
+// NOTE:TODO: in case of deleting files, the old built files remains, so each watch should be able to fine-granulated into clean+copy synchronized tasks
 gulp.task("watch", function() {
-  gulp.watch('./app/js/vendor/**/**.js', ['vendor-js']);
-  gulp.watch(['./app/js/**/*.js', '!./app/js/vendor/**/*.js'], ['main-js']);
+  gulp.watch('app/js/vendor/**/**.js', ['vendor-js']);
+  gulp.watch(['app/js/**/*.js', '!app/js/vendor/**/*.js'], ['main-js']);
 
-  gulp.watch('./app/style/css/**/*.css', ['copy-css']);
-  gulp.watch('./app/style/**/*.scss', ['scss']);
+  gulp.watch('app/style/css/**/*.css', ['copy-css']);
+  gulp.watch('app/style/**/*.scss', ['scss']);
 
-  gulp.watch('./app/html/*.html', ['html']);
+  gulp.watch('app/html/*.html', ['html']);
 
   // images, fonts, etc
 
@@ -291,6 +292,12 @@ gulp.task('help', function(){
     console.log("gulp --tasks   to see all available tasks.")
     console.log("");
 });
+
+
+//  Monitoring the gulpfile change and restart itself.
+// http://stackoverflow.com/questions/22886682/how-can-gulp-be-restarted-upon-each-gulpfile-change 
+
+
 
 //  NOT WORKING
 // // run a local server and open target page
