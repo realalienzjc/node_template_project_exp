@@ -19,6 +19,12 @@ Template project for quick starting a node.js based project.
 4. ```gulp dev``` to start the live build in your development environment. To build for the production environment, run ```gulp build --production```.
 
 
+5. Replace the content of README.md with your project description. 
+
+
+Coding in fun!
+
+
 
 ## TODO 
 
