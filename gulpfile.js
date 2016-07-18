@@ -124,10 +124,10 @@ gulp.task('vendor-js', function(){
 
 gulp.task('main-js',  function(options) {
     var appBundler = browserify({
-        entries: ['./app/main.js'], // Only need initial file, browserify finds the deps
+        entries: ['./app/js/main.js'], // Only need initial file, browserify finds the deps
         transform: [], // reactify : We want to convert JSX to normal javascript
         debug: !production,
-        paths: ['./app/'],  //  NOTE: to avoid copying ./app into ./build/app
+        //paths: ['./app/js'],  //  NOTE: to avoid copying ./app into ./build/app
         cache: {}, packageCache: {}, fullPaths: true // Requirement of watchify
     });
 
@@ -151,7 +151,7 @@ gulp.task('main-js',  function(options) {
         .pipe(gulpif( production, uglify().on('error', gutil.log))) // .pipe(gulpif( production, streamify(uglify())))
         .pipe(gulpif( development, sourceMaps.init({loadMaps: true}))) // NOTE: map file has to be generated after uglifys
         .pipe(gulpif( development, sourceMaps.write("./maps")))
-        .pipe(gulp.dest("./build/"))
+        .pipe(gulp.dest("./build/js/"))
         .pipe(browserSync.reload({ stream: true })) // .pipe(livereload())// It notifies livereload about a change if you use it
         .pipe(notify(function () {
           console.log('APP bundle built in ' + (Date.now() - start) + 'ms'); // TODO: why prompt twice? 
