@@ -66,7 +66,7 @@ gulp.task('clean', function (cb) {
 });
 
 //build
-gulp.task('build', ['html','js', 'style', 'copy-img']); // images, font
+gulp.task('build', ['html','js', 'style', 'copy-img', 'copy-audio']); // images, font
 
 // watch
 // NOTE:TODO: in case of deleting files, the old built files remains, so each watch should be able to fine-granulated into clean+copy synchronized tasks
@@ -79,8 +79,10 @@ gulp.task("watch", function() {
 
   gulp.watch('app/html/*.html', ['html']);
 
-  // images, fonts, etc
-  gulp.watch('app/image/*.{jpg,png,JPEG,PNG}', ['copy-img']);
+  // images, fonts, audio, etc
+  gulp.watch('app/audio/*.{jpg,png,JPEG,PNG}', ['copy-img']);
+  gulp.watch('app/audio/**/*.*', ['copy-audio']);
+
 
 });
 
@@ -190,6 +192,13 @@ gulp.task('images-min', function() {
     .pipe(gulp.dest('build/images'))
     .pipe(browserSync.reload({ stream: true }));
 });
+
+gulp.task("copy-audio", function() {
+    gulp.src('app/audio/**/*.*')
+    .pipe(gulp.dest('./build/audio'))
+    .pipe(browserSync.reload({ stream: true }));
+});
+
 
 // # Fonts
 gulp.task('copy-fonts', function() {

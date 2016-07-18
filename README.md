@@ -33,6 +33,9 @@ Template project for quick starting a node.js based project.
 
 * TODO: make 'build' tasks not watchified! 
 
+* TODO: the image/font/js/css/audio and other unspecified asset folder requires explicit rules on file copying, see if we can 
+--> IDEA: is it possible to create flatten assets folders referencing the files in each folder in the build?
+
 * TODO: multiple scss files preprocess
 
 * TODO: minimize the node_modules required
