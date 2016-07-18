@@ -24,6 +24,9 @@ Template project for quick starting a node.js based project.
 
 * TODO: How to launch specific path html when running a local server? 
 
+* TODO:ESP: how to minitoring the change if new files/folders are copied or when removing?
+  
+
 * TODO: react code, transforming
 
 * TODO: make 'build' tasks not watchified! 
