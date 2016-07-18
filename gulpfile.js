@@ -66,7 +66,7 @@ gulp.task('clean', function (cb) {
 });
 
 //build
-gulp.task('build', ['html','js', 'style' ]); // images, font
+gulp.task('build', ['html','js', 'style', 'copy-img']); // images, font
 
 // watch
 // NOTE:TODO: in case of deleting files, the old built files remains, so each watch should be able to fine-granulated into clean+copy synchronized tasks
@@ -80,7 +80,7 @@ gulp.task("watch", function() {
   gulp.watch('app/html/*.html', ['html']);
 
   // images, fonts, etc
-
+  gulp.watch('app/image/*.{jpg,png,JPEG,PNG}', ['copy-img']);
 
 });
 
@@ -178,7 +178,13 @@ gulp.task("html", function() {
 
 
 // Images
-gulp.task('images', function() {
+gulp.task("copy-img", function() {
+    gulp.src('app/image/**/*.{png,jpg,JPEG,PNG}')
+    .pipe(gulp.dest('./build/image'))
+    .pipe(browserSync.reload({ stream: true }));
+});
+
+gulp.task('images-min', function() {
   gulp.src('app/images/**/*.*')
     .pipe(imagemin())
     .pipe(gulp.dest('build/images'))
@@ -295,6 +301,7 @@ gulp.task('help', function(){
 
 
 //  Monitoring the gulpfile change and restart itself.
+// https://codepen.io/ScavaJripter/post/how-to-watch-the-same-gulpfile-js-with-gulp
 // http://stackoverflow.com/questions/22886682/how-can-gulp-be-restarted-upon-each-gulpfile-change 
 
 

@@ -22,10 +22,12 @@ Template project for quick starting a node.js based project.
 
 ## TODO 
 
-* TODO: How to launch specific path html when running a local server? 
+* TODO: ```gulp build``` not quit after task, is it hold on by Watch task?
 
 * TODO:ESP: how to minitoring the change if new files/folders are copied or when removing?
   
+
+* TODO: How to launch specific path html when running a local server? 
 
 * TODO: react code, transforming
 
