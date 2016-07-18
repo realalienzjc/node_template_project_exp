@@ -7,8 +7,16 @@ Template project for quick starting a node.js based project.
 
 
 
-## Commands
-npm install
+## How-to
+
+1. Under the root directory, remove the .git folder in order to avoid mingling with not project git commits. Either delete the folder manually or ```rm -rf .git``` in the CMD.
+
+2. ```git init``` to create your own project that is version controlled by Git. Commit to get the first source code check-in ```git commit -am "init commit"```.
+
+3. ```npm install``` to install the module required by the build sytem, gulpjs.
+
+
+4. ```gulp dev``` to start the live build in your development environment. To build for the production environment, run ```gulp build --production```.
 
 
 
