@@ -28,14 +28,18 @@ Coding in fun!
 
 ## TODO 
 
+
 * TODO: ```gulp build``` not quit after task, is it hold on by Watch task?
 
 * TODO:ESP: how to minitoring the change if new files/folders are copied or when removing?
-  
+
+* TODO: see if the watchify task can auto reload after a error code change  
 
 * TODO: How to launch specific path html when running a local server? 
 
 * TODO: react code, transforming
+
+* TODO: jslint task for code analysis
 
 * TODO: make 'build' tasks not watchified! 
 
